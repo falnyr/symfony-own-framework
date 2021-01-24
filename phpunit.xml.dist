@@ -4,10 +4,16 @@
     <include>
       <directory suffix=".php">./src</directory>
     </include>
+    <report>
+      <clover outputFile="coverage-report.xml" />
+    </report>
   </coverage>
   <testsuites>
     <testsuite name="Test Suite">
       <directory>./tests</directory>
     </testsuite>
   </testsuites>
+  <logging>
+    <junit outputFile="tests-report.xml"/>
+  </logging>
 </phpunit>

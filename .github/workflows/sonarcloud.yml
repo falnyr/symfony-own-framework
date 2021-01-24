@@ -1,0 +1,32 @@
+name: SonarCloud
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+jobs:
+  sonarcloud:
+    name: Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+      - name: Setup dependencies
+        run: composer install -n --no-progress
+      - name: Test coverage
+        env:
+          XDEBUG_MODE: coverage
+        run: vendor/bin/phpunit
+      - name: Fix paths # see https://community.sonarsource.com/t/no-code-coverage-with-phpunit/26536/3
+        run: |
+          sed -i 's/\/home\/runner\/work\/symfony-own-framework\/symfony-own-framework\//\/github\/workspace\//g' coverage-report.xml
+          sed -i 's/\/home\/runner\/work\/symfony-own-framework\/symfony-own-framework\//\/github\/workspace\//g' tests-report.xml
+      - name: Scan
+        uses: sonarsource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
